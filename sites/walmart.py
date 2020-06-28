@@ -15,7 +15,9 @@ class Walmart:
         self.submit_shipping_method(item_id, fulfillment_option, ship_method)
         self.submit_shipping_address()
         card_data,PIE_key_id,PIE_phase = self.get_PIE()
+        print(card_data,PIE_key_id,PIE_phase)
         pi_hash = self.submit_payment(card_data,PIE_key_id,PIE_phase)
+        print(pi_hash)
         self.submit_billing(pi_hash)
         self.submit_order()
     def monitor(self):
@@ -233,10 +235,19 @@ class Walmart:
             "accept-encoding": "gzip, deflate, br",
             "accept-language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
             "content-type": "application/json",
-            "inkiru_precedence": "false",
-            "origin": "https://www.walmart.com",
-            "referer": "https://www.walmart.com/checkout/",
-            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.69 Safari/537.36"
+            "authority":"www.walmart.com",
+            "scheme":"https",
+            "path":"/api/checkout-customer/:CID/credit-card",
+            "accept":"application/json",
+            "accept-language":"en-US,en;q=0.9,fr;q=0.8",
+            "user-agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36",
+            "origin":"https://www.walmart.com",
+            "sec-fetch-site":"same-origin",
+            "sec-fetch-mode":"cors",
+            "sec-fetch-dest":"empty",
+            "referer":"https://www.walmart.com/checkout/",
+            "accept-encoding":"gzip, deflate, br"
+        
         }
         profile = self.profile
         body = {
@@ -262,6 +273,7 @@ class Walmart:
             self.status_signal.emit({"msg":"Submitting Payment","status":"normal"})
             try:
                 r = self.session.post("https://www.walmart.com/api/checkout-customer/:CID/credit-card",json=body,headers=headers)
+                print(r.content, r.status_code, "ok")
                 if r.status_code == 200:
                     pi_hash = json.loads(r.text)["piHash"]
                     self.status_signal.emit({"msg":"Submitted Payment","status":"normal"})
@@ -347,6 +359,7 @@ class Walmart:
             try:
                 r = self.session.put("https://www.walmart.com/api/checkout/v3/contract/:PCID/order",json={},headers=headers)
                 try:
+                    print(r.content)
                     json.loads(r.text)["order"]
                     self.status_signal.emit({"msg":"Order Placed","status":"success"})
                     send_webhook("OP","Walmart",self.profile["profile_name"],self.task_id,self.product_image)
