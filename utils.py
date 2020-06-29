@@ -115,7 +115,8 @@ def start_browser(link,cookies):
     chrome_options = ChromeOptions()
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option("useAutomationExtension", False)
-    driver = Chrome(desired_capabilities=caps, executable_path=driver_path, options=chrome_options)
+    print(driver_path)
+    driver = Chrome(desired_capabilities=caps, executable_path='C:\chromedriver.exe', options=chrome_options)
     driver.execute_cdp_cmd(
             "Page.addScriptToEvaluateOnNewDocument",
             {

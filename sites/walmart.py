@@ -30,7 +30,7 @@ class Walmart:
             "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.69 Safari/537.36"
         }
         image_found = False
-        sproduct_image = ""
+        product_image = ""
         while True:
             self.status_signal.emit({"msg":"Loading Product Page","status":"normal"})
             try:
@@ -42,9 +42,7 @@ class Walmart:
                         self.image_signal.emit(product_image)
                         image_found = True
                     price = float(doc.xpath('//span[@itemprop="price"]/@content')[0])
-                    print(r,self.product,self.max_price,price)
                     if "add to cart" in r.text.lower():
-                        print('sdlldslkqsdjjqdsjkqsdjk')
                         if self.max_price !="":
                             if float(self.max_price) < price:
                                 self.status_signal.emit({"msg":"Waiting For Price Restock","status":"normal"})
