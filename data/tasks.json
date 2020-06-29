@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 [{"task_id": "1", "site": "Walmart", "product": "https://www.walmart.com/ip/Sceptre-50-Class-4K-UHD-LED-TV-U515CV-U/44829924", "profile": "Pisco", "proxies": "P4", "monitor_delay": "5.0", "error_delay": "5.0", "max_price": ""}]
+=======
+[{"task_id": "1", "site": "Walmart", "product": "https://www.walmart.com/ip/Wilson-Hex-Stinger-Soccer-Ball-Size-3/631216105", "profile": "klas", "proxies": "lop", "monitor_delay": "5.0", "error_delay": "5.0", "max_price": ""}, {"task_id": "2", "site": "Walmart", "product": "https://www.walmart.com/ip/Wilson-Hex-Stinger-Soccer-Ball-Size-3/631216105", "profile": "klas", "proxies": "None", "monitor_delay": "5.0", "error_delay": "5.0", "max_price": ""}, {"task_id": "3", "site": "Walmart", "product": "https://www.walmart.com/ip/Wilson-Hex-Stinger-Soccer-Ball-Size-3/631216105", "profile": "klas", "proxies": "None", "monitor_delay": "5.0", "error_delay": "5.0", "max_price": ""}]
+>>>>>>> 6b74bf042b3a9541a0a2041cdfd506fd62eccce2
