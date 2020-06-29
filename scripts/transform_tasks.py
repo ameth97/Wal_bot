@@ -28,7 +28,7 @@ class TransformTasks ():
         csv_df = csv_df.astype(str)
         csv_df.to_json(path_or_buf='data/profiles.json', orient='records')
 
-    def create_task(self, csv_path):
+    def create_tasks(self, csv_path):
 
         csv_df = pd.read_csv(csv_path, sep=';')
 
@@ -53,5 +53,6 @@ class TransformTasks ():
 
         return self.transform_to_json_profile(csv_df)
 
-t = TransformTasks()
-t.create_task('data/profiles.csv')
+if __name__ == "__main__":
+    t = TransformTasks()
+    t.create_tasks('data/profiles.csv')
