@@ -9,3 +9,4 @@ chromedriver-py==81.0.4044.69
 pycryptodome==3.4.3
 flask==0.12
 gunicorn==20.0.4
+flask_restful=0.3.8
