@@ -18,10 +18,15 @@ def buy_product(task):
 
     return 'ok'
 
-if __name__ == '__main__':
+def main(profile_name):
+
     load_proxies()
-    profile_name = "./profiles.csv"
     tasks = get_tasks(profile_name)
     executor = concurrent.futures.ProcessPoolExecutor(20)
     futures = [executor.submit(buy_product, task) for task in tasks]
     concurrent.futures.wait(futures)
+
+if __name__ == '__main__':
+    
+    profile_name = "./profiles.csv"
+    main(profile_name)
