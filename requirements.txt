@@ -3,6 +3,5 @@ requests==2.23.0
 lxml==4.5.0
 darkdetect==0.1.1
 colorama==0.4.3
-pycryptodome==3.4.3
-futures=3.3.0
-pandas=1.0.5
+pycryptodome==3.9.8
+pandas==1.0.5

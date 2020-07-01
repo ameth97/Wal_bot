@@ -2,11 +2,16 @@ from sites.walmart_encryption import walmart_encryption as w_e
 from utils import  get_proxy
 import urllib,requests,time,lxml.html,json,sys,settings
 import random
+from colorama import Fore
+
 
 class Walmart:
-    def __init__(self,task_id,status_signal,image_signal,product,profile,proxy,monitor_delay,error_delay,max_price, flask=False, proxies=None):
+    def __init__(self,task_id,status_signal,image_signal,product,profile,proxy,monitor_delay,error_delay,max_price, flask=False, proxies=None,
+    is_monitored=None, profile_name=None, monitor_group=None, run_task_group=None):
         self.task_id,self.status_signal,self.image_signal,self.product,self.profile,self.monitor_delay,self.error_delay,self.max_price,self.flask,\
-             self.proxies= task_id,status_signal,image_signal,product,profile,float(monitor_delay),float(error_delay),max_price, flask, proxies
+             self.proxies, self.is_monitored, self.profile_name, self.monitor_group, self.run_task_group = (task_id,status_signal,image_signal,product,
+                                    profile,float(monitor_delay),float(error_delay),max_price, flask, proxies, is_monitored, 
+                                    profile_name, monitor_group, run_task_group)
         self.session = requests.Session()
         if proxy != False:
             self.session.proxies.update(proxy)
@@ -23,6 +28,7 @@ class Walmart:
         pi_hash = self.submit_payment(card_data,PIE_key_id,PIE_phase)
         self.submit_billing(pi_hash)
         self.submit_order()
+
     def monitor(self):
         headers = {
             "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
@@ -34,6 +40,7 @@ class Walmart:
         }
         image_found = False
         product_image = ""
+        wait_restock = False
         while True:
             if not self.flask:
                self.status_signal.emit({"msg":"Loading Product Page","status":"normal"})
@@ -56,15 +63,26 @@ class Walmart:
                                    self.status_signal.emit({"msg":"Waiting For Price Restock","status":"normal"})
                                 else:
                                    print(f"task-{self.task_id}" + str({"msg":"Waiting For Price Restock","status":"normal"}))
+                                if not self.is_monitored:
+                                    print(f"task-{self.task_id}" +'idle monitoring')
+                                    exit(1)
+                                wait_restock = True
                                 self.session.cookies.clear()
                                 time.sleep(self.monitor_delay)
                                 continue
                         offer_id = json.loads(doc.xpath('//script[@id="item"]/text()')[0])["item"]["product"]["buyBox"]["products"][0]["offerId"]
+                        if(wait_restock):
+                               self.run_task_group(self.profile_name, self.monitor_group)
+                               exit()
                         return product_image, offer_id
                     if not self.flask:
                        self.status_signal.emit({"msg":"Waiting For Restock","status":"normal"})
                     else:
-                       print(f"task-{self.task_id}" + str({"msg":"Waiting For Restock","status":"normal"}))
+                        print(f"task-{self.task_id}" + str({"msg":"Waiting For Restock","status":"normal"}))
+                    if not self.is_monitored:
+                        print(f"task-{self.task_id}" +'idle monitoring')
+                        exit(1)
+                    wait_restock = True
                     self.session.cookies.clear()
                     time.sleep(self.monitor_delay)
                 else:
@@ -482,7 +500,9 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Order Placed","status":"success"})
                     else:
-                       print(f"task-{self.task_id}" + str({"msg":"Order Placed","status":"success"}))
+                       print(Fore.GREEN + f"task-{self.task_id}" + str({"msg":"Order Placed","status":"success"}))
+                       print(Fore.BLUE)
+
                        try:
                           f = open("success.txt", 'wt')
                           f.write(f"task {self.task_id} succeeded!")
@@ -496,7 +516,9 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Payment Failed","status":"error"})
                     else:
-                       print(f"task-{self.task_id}" + str({"msg":"Payment Failed","status":"error"}))
+                       print(Fore.RED + f"task-{self.task_id}" + str({"msg":"Payment Failed","status":"error"}))
+                       print(Fore.BLUE)
+
                     if self.check_browser():
                         return
                   #   ##send_webhook("PF","Walmart",self.profile["profile_name"],self.task_id,self.product_image)
@@ -505,7 +527,8 @@ class Walmart:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Order (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print(f"task-{self.task_id}" + str({"msg":"Error Submitting Order (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   print(Fore.RED + f"task-{self.task_id}" + str({"msg":"Error Submitting Order (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   print(Fore.BLUE)
                 time.sleep(self.error_delay)
     
     def check_browser(self):

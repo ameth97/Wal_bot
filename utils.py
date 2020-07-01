@@ -8,6 +8,7 @@ except:
 from colorama import init, Fore, Back, Style
 from datetime import datetime
 import json, platform, darkdetect, random, settings, threading, hashlib, base64
+
 normal_color = Fore.BLUE
 e_key = "YnJ1aG1vbWVudA==".encode()
 BLOCK_SIZE=16
@@ -53,6 +54,8 @@ def get_profile(profile_name):
                 pass
             return p
     return None
+
+
 
 def get_proxy(list_name):
     if list_name == "Proxy List" or list_name == "None":

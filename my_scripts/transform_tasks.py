@@ -26,7 +26,7 @@ def transform_to_json_profile(csv_df):
 
 def create_tasks( csv_path):
 
-    csv_df = pd.read_csv(csv_path, sep=',')
+    csv_df = pd.read_csv(csv_path, dtype=object, sep=',')
 
     task_df = csv_df[["store", "link"]].copy().rename(
         columns={'store': 'site', 'link': 'product'})
@@ -51,4 +51,4 @@ def create_tasks( csv_path):
 
 
 if __name__ == "__main__":
-    create_tasks('data/profile.csv')
+    create_tasks('./profiles.csv')
