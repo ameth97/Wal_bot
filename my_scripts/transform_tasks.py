@@ -21,11 +21,12 @@ def transform_to_json_profile(csv_df):
 
     csv_df.fillna('', inplace=True)
     csv_df = csv_df.astype(str)
+    csv_df["card_month"] = csv_df['card_month'].str.zfill(2)
     csv_df.to_json(path_or_buf='data/profiles.json', orient='records')
 
 def create_tasks( csv_path):
 
-    csv_df = pd.read_csv(csv_path, sep=';')
+    csv_df = pd.read_csv(csv_path, sep=',')
 
     task_df = csv_df[["store", "link"]].copy().rename(
         columns={'store': 'site', 'link': 'product'})
@@ -38,9 +39,9 @@ def create_tasks( csv_path):
     task_df["task_id"] = task_df.index
     task_df.fillna('', inplace=True)
     task_df = task_df.astype(str)
+    
 
     csv_df["profile_name"] = task_df.index
-    csv_df["profile_name"] = csv_df["profile_name"].apply(str)
 
     del csv_df['store'], csv_df['link']
 
@@ -50,4 +51,4 @@ def create_tasks( csv_path):
 
 
 if __name__ == "__main__":
-    create_tasks('data/profiles.csv')
+    create_tasks('data/profile.csv')

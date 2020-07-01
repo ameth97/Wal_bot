@@ -1,10 +1,10 @@
 global webhook
 webhook = ""
 global webhook_on_browser
-webhook_on_browser = True
+webhook_on_browser = False
 global webhook_on_order
-webhook_on_order = True
+webhook_on_order = False
 global webhook_on_failed
-webhook_on_failed = True
+webhook_on_failed = False
 global browser_on_failed
-browser_on_failed = True
+browser_on_failed = False

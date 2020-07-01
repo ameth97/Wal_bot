@@ -1,8 +1,8 @@
 {
     "webhook": "",
-    "webhookonbrowser": true,
-    "webhookonorder": true,
-    "webhookonfailed": true,
-    "browseronfailed": true,
+    "webhookonbrowser": false,
+    "webhookonorder": false,
+    "webhookonfailed": false,
+    "browseronfailed": false,
     "onlybuyone": true
 }
