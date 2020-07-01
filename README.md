@@ -1,5 +1,7 @@
 # WALBOT
 
+## Installation
+- pip install -r requirements.txt (or best use pipenv)
 
 ## Execution
 - put profiles in profiles.csv (each line is a task - id start from 0)
