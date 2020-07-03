@@ -9,6 +9,8 @@ from colorama import init, Fore, Back, Style
 from datetime import datetime
 import json, platform, darkdetect, random, settings, threading, hashlib, base64
 
+
+# this is for coloring
 normal_color = Fore.BLUE
 e_key = "YnJ1aG1vbWVudA==".encode()
 BLOCK_SIZE=16
@@ -17,21 +19,7 @@ if platform.system() == "Windows":
 else:
     init()
 print(normal_color + "Starting....")
-class Encryption:
 
-    def encrypt(self,msg):
-        IV = Random.new().read(BLOCK_SIZE)
-        aes = AES.new(self.trans(e_key), AES.MODE_CFB, IV)
-        return base64.b64encode(IV + aes.encrypt(msg.encode("utf-8")))
-    
-    def decrypt(self,msg):
-        msg = base64.b64decode(msg)
-        IV = msg[:BLOCK_SIZE]
-        aes = AES.new(self.trans(e_key), AES.MODE_CFB, IV)
-        return aes.decrypt(msg[BLOCK_SIZE:])
-    
-    def trans(self,key):
-        return hashlib.md5(key).digest()
 
 def return_data(path):
     with open(path,"r") as file:
@@ -44,20 +32,25 @@ def write_data(path,data):
         json.dump(data, file)
     file.close()
 
+
+
 def get_profile(profile_name):
     profiles = return_data("./data/profiles.json")
-    for p in profiles:
-        if p["profile_name"] == profile_name:
-            try:
-                p["card_number"] = (Encryption().decrypt(p["card_number"].encode("utf-8"))).decode("utf-8")
-            except ValueError:
-                pass
-            return p
+    for profile in profiles:
+        if profile["profile_name"]  == profile_name:
+            return profile
     return None
 
 
-
 def get_proxy(list_name):
+    """Given a list proxy name return one randomly choosen proxy
+
+    Args:
+        list_name (string): list of the proxy name
+
+    Returns:
+        [dict]: [a proxy formatted for request.session]
+    """    
     if list_name == "Proxy List" or list_name == "None":
         return False
     proxies = return_data("./data/proxies.json") 
@@ -67,6 +60,16 @@ def get_proxy(list_name):
     return None
 
 def format_proxy(proxy):
+    """format the proxie from host:port:user:pass to the dict below
+    to match requests.session of python
+
+    Args:
+        proxy (string): proxy in format host:port:user:pass
+
+    Returns:
+        [dict]: proxy dict
+    """
+
     try:
         proxy_parts = proxy.split(":")
         ip, port, user, passw = proxy_parts[0], proxy_parts[1], proxy_parts[2], proxy_parts[3]

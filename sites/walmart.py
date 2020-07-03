@@ -12,22 +12,28 @@ class Walmart:
              self.proxies, self.is_monitored, self.profile_name, self.monitor_group, self.run_task_group = (task_id,status_signal,image_signal,product,
                                     profile,float(monitor_delay),float(error_delay),max_price, flask, proxies, is_monitored, 
                                     profile_name, monitor_group, run_task_group)
+        """
+      Constructor of walmart class
+      automatically load profiles and performs tasks when called
+        """         
         self.session = requests.Session()
         if proxy != False:
-            self.session.proxies.update(proxy)
-        if not self.flask:
+            self.session.proxies.update(proxy) # add proxy to session
+        if not self.flask: # I was trying to use flask to create api to upload directly csv this can be evolution
            self.status_signal.emit({"msg":"Starting","status":"normal"})
         else:
            print(f"task-{self.task_id}" + str({"msg":"Starting","status":"normal"}))
-        self.product_image, offer_id = self.monitor()
-        self.atc(offer_id)
-        item_id, fulfillment_option, ship_method = self.check_cart_items()
-        self.submit_shipping_method(item_id, fulfillment_option, ship_method)
-        self.submit_shipping_address()
-        card_data,PIE_key_id,PIE_phase = self.get_PIE()
-        pi_hash = self.submit_payment(card_data,PIE_key_id,PIE_phase)
-        self.submit_billing(pi_hash)
-        self.submit_order()
+      
+        # this are the requests send by walamart during the process of buying product it's just copy paste from console
+        self.product_image, offer_id = self.monitor() #call the monitor product function if it's available the program continue
+        self.atc(offer_id)  # add product to cart
+        item_id, fulfillment_option, ship_method = self.check_cart_items() #load cart item
+        self.submit_shipping_method(item_id, fulfillment_option, ship_method) # shipping method submit
+        self.submit_shipping_address() # ssubmit shipping address
+        card_data,PIE_key_id,PIE_phase = self.get_PIE() # get cart encryption details
+        pi_hash = self.submit_payment(card_data,PIE_key_id,PIE_phase) # submit payment
+        self.submit_billing(pi_hash) # submit billing infos
+        self.submit_order() # put the order
 
     def monitor(self):
         headers = {
@@ -504,8 +510,8 @@ class Walmart:
                        print(Fore.BLUE)
 
                        try:
-                          f = open("success.txt", 'wt')
-                          f.write(f"task {self.task_id} succeeded!")
+                          f = open("success.txt", 'at')
+                          f.write(f"task {self.task_id} succeeded!\n")
                        except:
                           print('error logging success task {self.task_id}')
                        finally:
