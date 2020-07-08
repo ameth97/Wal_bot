@@ -44,7 +44,7 @@ def buy_product(task):
         [string]: [description]
     """    
     profile, proxy = get_profile(task["profile"]), get_proxy(task["proxies"])
-    # print(profile)
+    print("profile")
     Walmart(task["task_id"], None, None, task["product"], profile, proxy, task["monitor_delay"], task["error_delay"], 
             task["max_price"], flask=True, proxies=task["proxies"], is_monitored=task["monitor"], 
             profile_name=task["profile"],monitor_group=task['group'], run_task_group=run_task_group)

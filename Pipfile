@@ -4,10 +4,22 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pyinstaller = "*"
+pypiwin32 = "*"
+setuptools = "<45.0.0"
 
 [packages]
 flask = "*"
 gunicorn = "*"
+js2py = "==0.68"
+requests = "==2.23.0"
+lxml = "==4.5.0"
+darkdetect = "==0.1.1"
+colorama = "==0.4.3"
+pycryptodome = "==3.9.8"
+pandas = "==1.0.5"
+Unidecode = "*"
+pypiwin32 = "*"
 
 [requires]
 python_version = "3.7"
