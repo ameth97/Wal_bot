@@ -4,9 +4,9 @@
 - pip install -r requirements.txt (or best use pipenv)
 
 
-- pip install pipenv(pipenv)
-- pipenv install
-- pipenv shel
+- pip install pipenv (pipenv)
+- pipenv install (pipenv)
+- pipenv shell (pipenv)
 
 ## Execution
 - put profiles in profiles.csv (each line is a task - id start from 0)
