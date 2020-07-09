@@ -8,7 +8,7 @@ except:
 from colorama import init, Fore, Back, Style
 from datetime import datetime
 import json, platform, darkdetect, random, settings, threading, hashlib, base64
-
+from webhook import DiscordWebhook, DiscordEmbed
 
 # this is for coloring
 normal_color = Fore.BLUE
@@ -19,7 +19,7 @@ if platform.system() == "Windows":
 else:
     init()
 print(normal_color + "Starting....")
-
+print(settings)
 
 def return_data(path):
     with open(path,"r") as file:
@@ -80,3 +80,28 @@ def format_proxy(proxy):
     except IndexError:
         return {"http": "http://" + proxy, "https": "https://" + proxy}
 
+def send_webhook(webhook_type,site,profile,task_id,image_url):
+    if settings.webhook !="":
+        webhook = DiscordWebhook(url=settings.webhook, username="walmart Bot", avatar_url="https://i.imgur.com/tdp2hPi.jpg")
+        if webhook_type == "OP":
+            if not settings.webhook_on_order:
+                return
+            embed = DiscordEmbed(title="Order Placed",color=0x34c693)
+        elif webhook_type == "B":
+            if not settings.webhook_on_browser:
+                return
+            embed = DiscordEmbed(title="Complete Order in Browser",color=0xf2a689)
+        elif webhook_type == "PF":
+            if not settings.webhook_on_failed:
+                return
+            embed = DiscordEmbed(title="Payment Failed",color=0xfc5151)
+        embed.set_footer(text="Via walmart Bot",icon_url="https://i.imgur.com/tdp2hPi.jpg")
+        embed.add_embed_field(name="Site", value=site,inline=True)
+        embed.add_embed_field(name="Profile", value=profile,inline=True)
+        embed.add_embed_field(name="Task ID", value=task_id,inline=True)
+        embed.set_thumbnail(url=image_url)
+        webhook.add_embed(embed)
+        try:
+            webhook.execute()
+        except:
+            pass

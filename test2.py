@@ -66,7 +66,8 @@ def main(profile_name):
     load_proxies()
     tasks = get_tasks(profile_name)
     print(tasks)
-    executor = concurrent.futures.ProcessPoolExecutor(1)
+    num = min(20,len(tasks))
+    executor = concurrent.futures.ProcessPoolExecutor(num)
     futures = [executor.submit(buy_product, task) for task in tasks]
     concurrent.futures.wait(futures)
 

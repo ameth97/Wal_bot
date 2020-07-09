@@ -1,10 +1,6 @@
 global webhook
-webhook = ""
-global webhook_on_browser
-webhook_on_browser = False
+webhook = "https://discord.com/api/webhooks/730885837255868467/f5HbIOX0J8Wd0KuNyrgdpRH47qTOZs1URIYEn_whTAJzlZHS5qI3tsAH3T2banskCR5L"
 global webhook_on_order
-webhook_on_order = False
+webhook_on_order = True
 global webhook_on_failed
-webhook_on_failed = False
-global browser_on_failed
-browser_on_failed = False
+webhook_on_failed = True

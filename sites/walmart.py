@@ -1,5 +1,5 @@
 from sites.walmart_encryption import walmart_encryption as w_e
-from utils import  get_proxy
+from utils import  get_proxy, send_webhook
 import urllib,requests,time,lxml.html,json,sys,settings
 import random
 from colorama import Fore
@@ -516,7 +516,7 @@ class Walmart:
                           print('error logging success task {self.task_id}')
                        finally:
                           f.close()
-                    #send_webhook("OP","Walmart",self.profile["profile_name"],self.task_id,self.product_image)
+                    send_webhook("OP","Walmart",self.profile["profile_name"],self.task_id,self.product_image)
                     return
                 except:
                     if not self.flask:
@@ -527,7 +527,7 @@ class Walmart:
 
                     if self.check_browser():
                         return
-                  #   ##send_webhook("PF","Walmart",self.profile["profile_name"],self.task_id,self.product_image)
+                    send_webhook("PF","Walmart",self.profile["profile_name"],self.task_id,self.product_image)
                     return
             except Exception as e:
                 if not self.flask:
