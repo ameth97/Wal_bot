@@ -45,7 +45,6 @@ def buy_product(task):
         [string]: [description]
     """    
     profile, proxy = get_profile(task["profile"]), get_proxy(task["proxies"])
-    print("profile")
     Walmart(task["task_id"], None, None, task["product"], profile, proxy, task["monitor_delay"], task["error_delay"], 
             task["max_price"], flask=True, proxies=task["proxies"], is_monitored=task["monitor"], 
             profile_name=task["profile"],monitor_group=task['group'], run_task_group=run_task_group)
@@ -65,7 +64,6 @@ def main(profile_name):
     # here we multiprocess the tasks in tasks dict by 20 at a time
     load_proxies()
     tasks = get_tasks(profile_name)
-    print(tasks)
     num = min(20,len(tasks))
     executor = concurrent.futures.ProcessPoolExecutor(num)
     futures = [executor.submit(buy_product, task) for task in tasks]

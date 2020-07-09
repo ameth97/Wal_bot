@@ -18,8 +18,18 @@ if platform.system() == "Windows":
     init(convert=True)
 else:
     init()
-print(normal_color + "Starting....")
-print(settings)
+
+class EventLogger:
+    def ts(self):
+        return str(datetime.now())[:-7]
+    def normal(self,task_id,msg):
+        print(normal_color + "[{}][TASK {}] {}".format(self.ts(),task_id,msg))
+    def alt(self,task_id,msg):
+        print(Fore.MAGENTA + "[{}][TASK {}] {}".format(self.ts(),task_id,msg))
+    def error(self,task_id,msg):
+        print(Fore.RED + "[{}][TASK {}] {}".format(self.ts(),task_id,msg))
+    def success(self,task_id,msg):
+        print(Fore.GREEN + "[{}][TASK {}] {}".format(self.ts(),task_id,msg))
 
 def return_data(path):
     with open(path,"r") as file:

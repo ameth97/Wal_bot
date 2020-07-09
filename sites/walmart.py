@@ -1,10 +1,10 @@
 from sites.walmart_encryption import walmart_encryption as w_e
-from utils import  get_proxy, send_webhook
+from utils import  get_proxy, send_webhook, EventLogger
 import urllib,requests,time,lxml.html,json,sys,settings
 import random
 from colorama import Fore
 
-
+eventLogger = EventLogger()
 class Walmart:
     def __init__(self,task_id,status_signal,image_signal,product,profile,proxy,monitor_delay,error_delay,max_price, flask=False, proxies=None,
     is_monitored=None, profile_name=None, monitor_group=None, run_task_group=None):
@@ -22,7 +22,7 @@ class Walmart:
         if not self.flask: # I was trying to use flask to create api to upload directly csv this can be evolution
            self.status_signal.emit({"msg":"Starting","status":"normal"})
         else:
-           print("task-{}".format(self.task_id) + str({"msg":"Starting","status":"normal"}))
+           eventLogger.normal(self.task_id, "Starting")
       
         # this are the requests send by walamart during the process of buying product it's just copy paste from console
         self.product_image, offer_id = self.monitor() #call the monitor product function if it's available the program continue
@@ -51,7 +51,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Loading Product Page","status":"normal"})
             else:
-               print("task-{}".format(self.task_id) + str({"msg":"Loading Product Page","status":"normal"}))
+               eventLogger.normal(self.task_id, "Loading Product Page")
             try:
                 r = self.session.get(self.product,headers=headers)
                 if r.status_code == 200:
@@ -68,9 +68,9 @@ class Walmart:
                                 if not self.flask:
                                    self.status_signal.emit({"msg":"Waiting For Price Restock","status":"normal"})
                                 else:
-                                   print("task-{}".format(self.task_id) + str({"msg":"Waiting For Price Restock","status":"normal"}))
+                                   eventLogger.alt(self.task_id, "Waiting For Price Restock")
                                 if not self.is_monitored:
-                                    print("task-{}".format(self.task_id) +'idle monitoring')
+                                    eventLogger.alt(self.task_id, 'idle monitoring')
                                     exit(1)
                                 wait_restock = True
                                 self.session.cookies.clear()
@@ -84,9 +84,9 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Waiting For Restock","status":"normal"})
                     else:
-                        print("task-{}".format(self.task_id) + str({"msg":"Waiting For Restock","status":"normal"}))
+                        eventLogger.alt(self.task_id, "Waiting For Restock")
                     if not self.is_monitored:
-                        print("task-{}".format(self.task_id) +'idle monitoring')
+                        eventLogger.alt(self.task_id, 'idle monitoring')
                         exit(1)
                     wait_restock = True
                     self.session.cookies.clear()
@@ -97,13 +97,13 @@ class Walmart:
                      if not self.flask:
                         self.status_signal.emit({"msg":"Product Not Found","status":"normal"})
                      else:
-                        print("task-{}".format(self.task_id) + str({"msg":"Product Not Found","status":"normal"}),r)
+                        eventLogger.normal(self.task_id, "Product Not Found")
                      time.sleep(self.monitor_delay)
             except Exception as e:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Loading Product Page (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print("task-{}".format(self.task_id) + str({"msg":"Error Loading Product Page (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   eventLogger.error(self.task_id, "Error Loading Product Page (line {} {} {})")
                 time.sleep(self.error_delay)
     
     def atc(self,offer_id):
@@ -121,14 +121,14 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Adding To Cart","status":"normal"})
             else:
-               print("task-{}".format(self.task_id) + str({"msg":"Adding To Cart","status":"normal"}))
+               eventLogger.normal(self.task_id, "Adding To Cart")
             try:
                 r = self.session.post("https://www.walmart.com/api/v3/cart/guest/:CID/items",json=body,headers=headers)
                 if r.status_code == 201 and json.loads(r.text)["checkoutable"] == True:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Added To Cart","status":"carted"})
                     else:
-                       print("task-{}".format(self.task_id) + str({"msg":"Added To Cart","status":"carted"}))
+                       eventLogger.success(self.task_id, "Added To Cart")
                     return
                 else:
                     if self.proxies:
@@ -136,13 +136,13 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Error Adding To Cart","status":"error"})
                     else:
-                       print("task-{}".format(self.task_id) + str({"msg":"Error Adding To Cart","status":"error"}),r.content)
+                       eventLogger.error(self.task_id, "Error Adding To Cart")
                     time.sleep(self.error_delay) 
             except Exception as e:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Adding To Cart (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print("task-{}".format(self.task_id) + str({"msg":"Error Adding To Cart (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   eventLogger.normal(self.task_id, "Error Adding To Cart (line {} {} {})")
                 time.sleep(self.error_delay)
 
     def check_cart_items(self):
@@ -162,7 +162,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Loading Cart Items","status":"normal"})
             else:
-               print("task-{}".format(self.task_id) + str({"msg":"Loading Cart Items","status":"normal"}))
+               eventLogger.normal(self.task_id, "Loading Cart Items")
             try:
                 r = self.session.post("https://www.walmart.com/api/checkout/v3/contract?page=CHECKOUT_VIEW",json=body,headers=headers)
                 if r.status_code == 201:
@@ -173,26 +173,26 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Loaded Cart Items","status":"normal"})
                     else:
-                       print("task-{}".format(self.task_id) + str({"msg":"Loaded Cart Items","status":"normal"}))
+                       eventLogger.normal(self.task_id, "Loaded Cart Items")
                     return item_id, fulfillment_option, ship_method
                 else:
                     if json.loads(r.text)["message"] == "Item is no longer in stock.":
                         if not self.flask:
                            self.status_signal.emit({"msg":"Waiting For Restock","status":"normal"})
                         else:
-                           print("task-{}".format(self.task_id) + str({"msg":"Waiting For Restock","status":"normal"}))
+                           eventLogger.alt(self.task_id, "Waiting For Restock")
                         time.sleep(self.monitor_delay)
                     else:
                         if not self.flask:
                            self.status_signal.emit({"msg":"Error Loading Cart Items, Got Response: "+str(r.text),"status":"error"})
                         else:
-                           print("task-{}".format(self.task_id) + str({"msg":"Error Loading Cart Items, Got Response: "+str(r.text),"status":"error"}))
+                           eventLogger.error(self.task_id, "Error Loading Cart Items, Got Response: ")
                         time.sleep(self.error_delay) 
             except Exception as e:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Loading Cart Items (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print("task-{}".format(self.task_id) + str({"msg":"Error Loading Cart Items (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   eventLogger.normal(self.task_id, "Error Loading Cart Items (line {} {} {})")
                 time.sleep(self.error_delay)
 
     def submit_shipping_method(self, item_id, fulfillment_option, ship_method):
@@ -211,7 +211,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Submitting Shipping Method","status":"normal"})
             else:
-               print("task-{}".format(self.task_id) + str({"msg":"Submitting Shipping Method","status":"normal"}))
+               eventLogger.normal(self.task_id, "Submitting Shipping Method")
             try:
                 r = self.session.post("https://www.walmart.com/api/checkout/v3/contract/:PCID/fulfillment",json=body,headers=headers)
                 if r.status_code == 200:
@@ -220,20 +220,20 @@ class Walmart:
                         if not self.flask:
                            self.status_signal.emit({"msg":"Submitted Shipping Method","status":"normal"})
                         else:
-                           print("task-{}".format(self.task_id) + str({"msg":"Submitted Shipping Method","status":"normal"}))
+                           eventLogger.normal(self.task_id, "Submitted Shipping Method")
                         return
                     except:
                         pass
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Shipping Method","status":"error"})
                 else:
-                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Shipping Method","status":"error"}))
+                   eventLogger.error(self.task_id, "Error Submitting Shipping Method")
                 time.sleep(self.error_delay)
             except Exception as e:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Shipping Method (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Shipping Method (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   eventLogger.normal(self.task_id, "Error Submitting Shipping Method (line {} {} {})")
                 time.sleep(self.error_delay)
     
     def submit_shipping_address(self):
@@ -269,7 +269,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Submitting Shipping Address","status":"normal"})
             else:
-               print("task-{}".format(self.task_id) + str({"msg":"Submitting Shipping Address","status":"normal"}))
+               eventLogger.normal(self.task_id, "Submitting Shipping Address")
             try:
                 r = self.session.post("https://www.walmart.com/api/checkout/v3/contract/:PCID/shipping-address",json=body,headers=headers)
                 if r.status_code == 200:
@@ -278,20 +278,20 @@ class Walmart:
                         if not self.flask:
                            self.status_signal.emit({"msg":"Submitted Shipping Address","status":"normal"})
                         else:
-                           print("task-{}".format(self.task_id) + str({"msg":"Submitted Shipping Address","status":"normal"}))
+                           eventLogger.normal(self.task_id, "Submitted Shipping Address")
                         return
                     except:
                         pass
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Shipping Address","status":"error"})
                 else:
-                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Shipping Address","status":"error"}))
+                   eventLogger.error(self.task_id, "Error Submitting Shipping Address")
                 time.sleep(self.error_delay)
             except Exception as e:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Shipping Address (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Shipping Address (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   eventLogger.normal(self.task_id, "Error Submitting Shipping Address (line {} {} {})")
                 time.sleep(self.error_delay)
     
     def get_PIE(self):
@@ -309,7 +309,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Getting Checkout Data","status":"normal"})
             else:
-               print("task-{}".format(self.task_id) + str({"msg":"Getting Checkout Data","status":"normal"}))
+               eventLogger.normal(self.task_id, "Getting Checkout Data")
             try:
                 r = self.session.get("https://securedataweb.walmart.com/pie/v1/wmcom_us_vtg_pie/getkey.js?bust="+str(int(time.time())),headers=headers)
                 if r.status_code == 200:
@@ -322,18 +322,18 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Got Checkout Data","status":"normal"})
                     else:
-                       print("task-{}".format(self.task_id) + str({"msg":"Got Checkout Data","status":"normal"}))
+                       eventLogger.normal(self.task_id, "Got Checkout Data")
                     return card_data, PIE_key_id, PIE_phase
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Getting Checkout Data","status":"error"})
                 else:
-                   print("task-{}".format(self.task_id) + str({"msg":"Error Getting Checkout Data","status":"error"}))
+                   eventLogger.error(self.task_id, "Error Getting Checkout Data")
                 time.sleep(self.error_delay)
             except Exception as e:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Getting Checkout Data (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print("task-{}".format(self.task_id) + str({"msg":"Error Getting Checkout Data (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   eventLogger.normal(self.task_id, "Error Getting Checkout Data (line {} {} {})")
                 time.sleep(self.error_delay)
     
     def submit_payment(self,card_data,PIE_key_id,PIE_phase):
@@ -380,7 +380,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Submitting Payment","status":"normal"})
             else:
-               print("task-{}".format(self.task_id) + str({"msg":"Submitting Payment","status":"normal"}))
+               eventLogger.normal(self.task_id, "Submitting Payment")
             try:
                 r = self.session.post("https://www.walmart.com/api/checkout-customer/:CID/credit-card",json=body,headers=headers)
                 if r.status_code == 200:
@@ -388,14 +388,14 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Submitted Payment","status":"normal"})
                     else:
-                       print("task-{}".format(self.task_id) + str({"msg":"Submitted Payment","status":"normal"}))
+                       eventLogger.normal(self.task_id, "Submitted Payment")
                     return pi_hash
                 if self.proxies:
                         self.session.proxies.update(get_proxy(self.proxies))
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Payment","status":"error"})
                 else:
-                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Payment","status":"error"}))
+                   eventLogger.error(self.task_id, "Error Submitting Payment")
                 if self.check_browser():
                     return
                 time.sleep(self.error_delay)
@@ -403,7 +403,7 @@ class Walmart:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Payment (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Payment (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   eventLogger.normal(self.task_id, "Error Submitting Payment (line {} {} {})")
                 time.sleep(self.error_delay)
 
     def submit_billing(self,pi_hash):
@@ -447,7 +447,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Submitting Billing","status":"normal"})
             else:
-               print("task-{}".format(self.task_id) + str({"msg":"Submitting Billing","status":"normal"}))
+               eventLogger.normal(self.task_id, "Submitting Billing")
             try:
                 r = self.session.post("https://www.walmart.com/api/checkout/v3/contract/:PCID/payment",json=body,headers=headers)
                 if r.status_code == 200:
@@ -456,14 +456,14 @@ class Walmart:
                         if not self.flask:
                            self.status_signal.emit({"msg":"Submitted Billing","status":"normal"})
                         else:
-                           print("task-{}".format(self.task_id) + str({"msg":"Submitted Billing","status":"normal"}))
+                           eventLogger.normal(self.task_id, "Submitted Billing")
                         return
                     except:
                         pass
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Billing","status":"error"})
                 else:
-                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Billing","status":"error"}))
+                   eventLogger.error(self.task_id, "Error Submitting Billing")
                 if self.check_browser():
                     return
                 time.sleep(self.error_delay)
@@ -471,7 +471,7 @@ class Walmart:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Billing (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Billing (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   eventLogger.normal(self.task_id, "Error Submitting Billing (line {} {} {})")
                 time.sleep(self.error_delay)
     
     def submit_order(self):
@@ -498,7 +498,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Submitting Order","status":"alt"})
             else:
-               print("task-{}".format(self.task_id) + str({"msg":"Submitting Order","status":"alt"}))
+               eventLogger.alt(self.task_id, "Submitting Order")
             try:
                 r = self.session.put("https://www.walmart.com/api/checkout/v3/contract/:PCID/order",json={},headers=headers)
                 try:
@@ -506,14 +506,13 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Order Placed","status":"success"})
                     else:
-                       print(Fore.GREEN + "task-{}".format(self.task_id) + str({"msg":"Order Placed","status":"success"}))
-                       print(Fore.BLUE)
+                       eventLogger.success(self.task_id, "Order Placed")
 
                        try:
                           f = open("success.txt", 'at')
                           f.write("task {} succeeded!\n".format('self.task_id'))
                        except:
-                          print('error logging success task {self.task_id}')
+                          eventLogger.error(self.task_id, 'error logging success task')
                        finally:
                           f.close()
                     send_webhook("OP","Walmart",self.profile["profile_name"],self.task_id,self.product_image)
@@ -522,8 +521,7 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Payment Failed","status":"error"})
                     else:
-                       print(Fore.RED + "task-{}".format(self.task_id) + str({"msg":"Payment Failed","status":"error"}))
-                       print(Fore.BLUE)
+                       eventLogger.error(self.task_id, "Payment Failed")
 
                     if self.check_browser():
                         return
@@ -533,8 +531,7 @@ class Walmart:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Order (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print(Fore.RED + "task-{}".format(self.task_id) + str({"msg":"Error Submitting Order (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
-                   print(Fore.BLUE)
+                   eventLogger.error(self.task_id, str({"msg":"Error Submitting Order (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
                 time.sleep(self.error_delay)
     
     def check_browser(self):
@@ -543,7 +540,7 @@ class Walmart:
       #          self.status_signal.emit({"msg":"Browser Ready","status":"alt","url":"https://www.walmart.com/checkout/#/payment","cookies":[{"name":cookie.name,"value":cookie.value,"domain":cookie.domain} for cookie in self.session.cookies]})
       #       else:
       #           pass
-      #       #    print("task-{}".format(self.task_id) + str({"msg":"Browser Ready","status":"alt","url":"https://www.walmart.com/checkout/#/payment","cookies":[{"name":cookie.name,"value":cookie.value,"domain":cookie.domain} for cookie in self.session.cookies]}))
+      #       #    eventLogger.normal(self.task_id, "Browser Ready")
       #       # #send_webhook("B","Walmart",self.profile["profile_name"],self.task_id,self.product_image)
       #       return True
         return False
