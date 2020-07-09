@@ -22,7 +22,7 @@ class Walmart:
         if not self.flask: # I was trying to use flask to create api to upload directly csv this can be evolution
            self.status_signal.emit({"msg":"Starting","status":"normal"})
         else:
-           print(f"task-{self.task_id}" + str({"msg":"Starting","status":"normal"}))
+           print("task-{}".format(self.task_id) + str({"msg":"Starting","status":"normal"}))
       
         # this are the requests send by walamart during the process of buying product it's just copy paste from console
         self.product_image, offer_id = self.monitor() #call the monitor product function if it's available the program continue
@@ -51,7 +51,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Loading Product Page","status":"normal"})
             else:
-               print(f"task-{self.task_id}" + str({"msg":"Loading Product Page","status":"normal"}))
+               print("task-{}".format(self.task_id) + str({"msg":"Loading Product Page","status":"normal"}))
             try:
                 r = self.session.get(self.product,headers=headers)
                 if r.status_code == 200:
@@ -68,9 +68,9 @@ class Walmart:
                                 if not self.flask:
                                    self.status_signal.emit({"msg":"Waiting For Price Restock","status":"normal"})
                                 else:
-                                   print(f"task-{self.task_id}" + str({"msg":"Waiting For Price Restock","status":"normal"}))
+                                   print("task-{}".format(self.task_id) + str({"msg":"Waiting For Price Restock","status":"normal"}))
                                 if not self.is_monitored:
-                                    print(f"task-{self.task_id}" +'idle monitoring')
+                                    print("task-{}".format(self.task_id) +'idle monitoring')
                                     exit(1)
                                 wait_restock = True
                                 self.session.cookies.clear()
@@ -84,9 +84,9 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Waiting For Restock","status":"normal"})
                     else:
-                        print(f"task-{self.task_id}" + str({"msg":"Waiting For Restock","status":"normal"}))
+                        print("task-{}".format(self.task_id) + str({"msg":"Waiting For Restock","status":"normal"}))
                     if not self.is_monitored:
-                        print(f"task-{self.task_id}" +'idle monitoring')
+                        print("task-{}".format(self.task_id) +'idle monitoring')
                         exit(1)
                     wait_restock = True
                     self.session.cookies.clear()
@@ -97,13 +97,13 @@ class Walmart:
                      if not self.flask:
                         self.status_signal.emit({"msg":"Product Not Found","status":"normal"})
                      else:
-                        print(f"task-{self.task_id}" + str({"msg":"Product Not Found","status":"normal"}),r)
+                        print("task-{}".format(self.task_id) + str({"msg":"Product Not Found","status":"normal"}),r)
                      time.sleep(self.monitor_delay)
             except Exception as e:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Loading Product Page (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print(f"task-{self.task_id}" + str({"msg":"Error Loading Product Page (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   print("task-{}".format(self.task_id) + str({"msg":"Error Loading Product Page (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
                 time.sleep(self.error_delay)
     
     def atc(self,offer_id):
@@ -121,14 +121,14 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Adding To Cart","status":"normal"})
             else:
-               print(f"task-{self.task_id}" + str({"msg":"Adding To Cart","status":"normal"}))
+               print("task-{}".format(self.task_id) + str({"msg":"Adding To Cart","status":"normal"}))
             try:
                 r = self.session.post("https://www.walmart.com/api/v3/cart/guest/:CID/items",json=body,headers=headers)
                 if r.status_code == 201 and json.loads(r.text)["checkoutable"] == True:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Added To Cart","status":"carted"})
                     else:
-                       print(f"task-{self.task_id}" + str({"msg":"Added To Cart","status":"carted"}))
+                       print("task-{}".format(self.task_id) + str({"msg":"Added To Cart","status":"carted"}))
                     return
                 else:
                     if self.proxies:
@@ -136,13 +136,13 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Error Adding To Cart","status":"error"})
                     else:
-                       print(f"task-{self.task_id}" + str({"msg":"Error Adding To Cart","status":"error"}),r.content)
+                       print("task-{}".format(self.task_id) + str({"msg":"Error Adding To Cart","status":"error"}),r.content)
                     time.sleep(self.error_delay) 
             except Exception as e:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Adding To Cart (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print(f"task-{self.task_id}" + str({"msg":"Error Adding To Cart (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   print("task-{}".format(self.task_id) + str({"msg":"Error Adding To Cart (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
                 time.sleep(self.error_delay)
 
     def check_cart_items(self):
@@ -162,7 +162,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Loading Cart Items","status":"normal"})
             else:
-               print(f"task-{self.task_id}" + str({"msg":"Loading Cart Items","status":"normal"}))
+               print("task-{}".format(self.task_id) + str({"msg":"Loading Cart Items","status":"normal"}))
             try:
                 r = self.session.post("https://www.walmart.com/api/checkout/v3/contract?page=CHECKOUT_VIEW",json=body,headers=headers)
                 if r.status_code == 201:
@@ -173,26 +173,26 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Loaded Cart Items","status":"normal"})
                     else:
-                       print(f"task-{self.task_id}" + str({"msg":"Loaded Cart Items","status":"normal"}))
+                       print("task-{}".format(self.task_id) + str({"msg":"Loaded Cart Items","status":"normal"}))
                     return item_id, fulfillment_option, ship_method
                 else:
                     if json.loads(r.text)["message"] == "Item is no longer in stock.":
                         if not self.flask:
                            self.status_signal.emit({"msg":"Waiting For Restock","status":"normal"})
                         else:
-                           print(f"task-{self.task_id}" + str({"msg":"Waiting For Restock","status":"normal"}))
+                           print("task-{}".format(self.task_id) + str({"msg":"Waiting For Restock","status":"normal"}))
                         time.sleep(self.monitor_delay)
                     else:
                         if not self.flask:
                            self.status_signal.emit({"msg":"Error Loading Cart Items, Got Response: "+str(r.text),"status":"error"})
                         else:
-                           print(f"task-{self.task_id}" + str({"msg":"Error Loading Cart Items, Got Response: "+str(r.text),"status":"error"}))
+                           print("task-{}".format(self.task_id) + str({"msg":"Error Loading Cart Items, Got Response: "+str(r.text),"status":"error"}))
                         time.sleep(self.error_delay) 
             except Exception as e:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Loading Cart Items (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print(f"task-{self.task_id}" + str({"msg":"Error Loading Cart Items (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   print("task-{}".format(self.task_id) + str({"msg":"Error Loading Cart Items (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
                 time.sleep(self.error_delay)
 
     def submit_shipping_method(self, item_id, fulfillment_option, ship_method):
@@ -211,7 +211,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Submitting Shipping Method","status":"normal"})
             else:
-               print(f"task-{self.task_id}" + str({"msg":"Submitting Shipping Method","status":"normal"}))
+               print("task-{}".format(self.task_id) + str({"msg":"Submitting Shipping Method","status":"normal"}))
             try:
                 r = self.session.post("https://www.walmart.com/api/checkout/v3/contract/:PCID/fulfillment",json=body,headers=headers)
                 if r.status_code == 200:
@@ -220,20 +220,20 @@ class Walmart:
                         if not self.flask:
                            self.status_signal.emit({"msg":"Submitted Shipping Method","status":"normal"})
                         else:
-                           print(f"task-{self.task_id}" + str({"msg":"Submitted Shipping Method","status":"normal"}))
+                           print("task-{}".format(self.task_id) + str({"msg":"Submitted Shipping Method","status":"normal"}))
                         return
                     except:
                         pass
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Shipping Method","status":"error"})
                 else:
-                   print(f"task-{self.task_id}" + str({"msg":"Error Submitting Shipping Method","status":"error"}))
+                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Shipping Method","status":"error"}))
                 time.sleep(self.error_delay)
             except Exception as e:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Shipping Method (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print(f"task-{self.task_id}" + str({"msg":"Error Submitting Shipping Method (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Shipping Method (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
                 time.sleep(self.error_delay)
     
     def submit_shipping_address(self):
@@ -269,7 +269,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Submitting Shipping Address","status":"normal"})
             else:
-               print(f"task-{self.task_id}" + str({"msg":"Submitting Shipping Address","status":"normal"}))
+               print("task-{}".format(self.task_id) + str({"msg":"Submitting Shipping Address","status":"normal"}))
             try:
                 r = self.session.post("https://www.walmart.com/api/checkout/v3/contract/:PCID/shipping-address",json=body,headers=headers)
                 if r.status_code == 200:
@@ -278,20 +278,20 @@ class Walmart:
                         if not self.flask:
                            self.status_signal.emit({"msg":"Submitted Shipping Address","status":"normal"})
                         else:
-                           print(f"task-{self.task_id}" + str({"msg":"Submitted Shipping Address","status":"normal"}))
+                           print("task-{}".format(self.task_id) + str({"msg":"Submitted Shipping Address","status":"normal"}))
                         return
                     except:
                         pass
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Shipping Address","status":"error"})
                 else:
-                   print(f"task-{self.task_id}" + str({"msg":"Error Submitting Shipping Address","status":"error"}))
+                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Shipping Address","status":"error"}))
                 time.sleep(self.error_delay)
             except Exception as e:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Shipping Address (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print(f"task-{self.task_id}" + str({"msg":"Error Submitting Shipping Address (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Shipping Address (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
                 time.sleep(self.error_delay)
     
     def get_PIE(self):
@@ -309,7 +309,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Getting Checkout Data","status":"normal"})
             else:
-               print(f"task-{self.task_id}" + str({"msg":"Getting Checkout Data","status":"normal"}))
+               print("task-{}".format(self.task_id) + str({"msg":"Getting Checkout Data","status":"normal"}))
             try:
                 r = self.session.get("https://securedataweb.walmart.com/pie/v1/wmcom_us_vtg_pie/getkey.js?bust="+str(int(time.time())),headers=headers)
                 if r.status_code == 200:
@@ -322,18 +322,18 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Got Checkout Data","status":"normal"})
                     else:
-                       print(f"task-{self.task_id}" + str({"msg":"Got Checkout Data","status":"normal"}))
+                       print("task-{}".format(self.task_id) + str({"msg":"Got Checkout Data","status":"normal"}))
                     return card_data, PIE_key_id, PIE_phase
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Getting Checkout Data","status":"error"})
                 else:
-                   print(f"task-{self.task_id}" + str({"msg":"Error Getting Checkout Data","status":"error"}))
+                   print("task-{}".format(self.task_id) + str({"msg":"Error Getting Checkout Data","status":"error"}))
                 time.sleep(self.error_delay)
             except Exception as e:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Getting Checkout Data (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print(f"task-{self.task_id}" + str({"msg":"Error Getting Checkout Data (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   print("task-{}".format(self.task_id) + str({"msg":"Error Getting Checkout Data (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
                 time.sleep(self.error_delay)
     
     def submit_payment(self,card_data,PIE_key_id,PIE_phase):
@@ -380,7 +380,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Submitting Payment","status":"normal"})
             else:
-               print(f"task-{self.task_id}" + str({"msg":"Submitting Payment","status":"normal"}))
+               print("task-{}".format(self.task_id) + str({"msg":"Submitting Payment","status":"normal"}))
             try:
                 r = self.session.post("https://www.walmart.com/api/checkout-customer/:CID/credit-card",json=body,headers=headers)
                 if r.status_code == 200:
@@ -388,14 +388,14 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Submitted Payment","status":"normal"})
                     else:
-                       print(f"task-{self.task_id}" + str({"msg":"Submitted Payment","status":"normal"}))
+                       print("task-{}".format(self.task_id) + str({"msg":"Submitted Payment","status":"normal"}))
                     return pi_hash
                 if self.proxies:
                         self.session.proxies.update(get_proxy(self.proxies))
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Payment","status":"error"})
                 else:
-                   print(f"task-{self.task_id}" + str({"msg":"Error Submitting Payment","status":"error"}))
+                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Payment","status":"error"}))
                 if self.check_browser():
                     return
                 time.sleep(self.error_delay)
@@ -403,7 +403,7 @@ class Walmart:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Payment (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print(f"task-{self.task_id}" + str({"msg":"Error Submitting Payment (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Payment (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
                 time.sleep(self.error_delay)
 
     def submit_billing(self,pi_hash):
@@ -447,7 +447,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Submitting Billing","status":"normal"})
             else:
-               print(f"task-{self.task_id}" + str({"msg":"Submitting Billing","status":"normal"}))
+               print("task-{}".format(self.task_id) + str({"msg":"Submitting Billing","status":"normal"}))
             try:
                 r = self.session.post("https://www.walmart.com/api/checkout/v3/contract/:PCID/payment",json=body,headers=headers)
                 if r.status_code == 200:
@@ -456,14 +456,14 @@ class Walmart:
                         if not self.flask:
                            self.status_signal.emit({"msg":"Submitted Billing","status":"normal"})
                         else:
-                           print(f"task-{self.task_id}" + str({"msg":"Submitted Billing","status":"normal"}))
+                           print("task-{}".format(self.task_id) + str({"msg":"Submitted Billing","status":"normal"}))
                         return
                     except:
                         pass
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Billing","status":"error"})
                 else:
-                   print(f"task-{self.task_id}" + str({"msg":"Error Submitting Billing","status":"error"}))
+                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Billing","status":"error"}))
                 if self.check_browser():
                     return
                 time.sleep(self.error_delay)
@@ -471,7 +471,7 @@ class Walmart:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Billing (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print(f"task-{self.task_id}" + str({"msg":"Error Submitting Billing (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   print("task-{}".format(self.task_id) + str({"msg":"Error Submitting Billing (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
                 time.sleep(self.error_delay)
     
     def submit_order(self):
@@ -498,7 +498,7 @@ class Walmart:
             if not self.flask:
                self.status_signal.emit({"msg":"Submitting Order","status":"alt"})
             else:
-               print(f"task-{self.task_id}" + str({"msg":"Submitting Order","status":"alt"}))
+               print("task-{}".format(self.task_id) + str({"msg":"Submitting Order","status":"alt"}))
             try:
                 r = self.session.put("https://www.walmart.com/api/checkout/v3/contract/:PCID/order",json={},headers=headers)
                 try:
@@ -506,12 +506,12 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Order Placed","status":"success"})
                     else:
-                       print(Fore.GREEN + f"task-{self.task_id}" + str({"msg":"Order Placed","status":"success"}))
+                       print(Fore.GREEN + "task-{}".format(self.task_id) + str({"msg":"Order Placed","status":"success"}))
                        print(Fore.BLUE)
 
                        try:
                           f = open("success.txt", 'at')
-                          f.write(f"task {self.task_id} succeeded!\n")
+                          f.write("task {} succeeded!\n".format('self.task_id'))
                        except:
                           print('error logging success task {self.task_id}')
                        finally:
@@ -522,7 +522,7 @@ class Walmart:
                     if not self.flask:
                        self.status_signal.emit({"msg":"Payment Failed","status":"error"})
                     else:
-                       print(Fore.RED + f"task-{self.task_id}" + str({"msg":"Payment Failed","status":"error"}))
+                       print(Fore.RED + "task-{}".format(self.task_id) + str({"msg":"Payment Failed","status":"error"}))
                        print(Fore.BLUE)
 
                     if self.check_browser():
@@ -533,7 +533,7 @@ class Walmart:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Submitting Order (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   print(Fore.RED + f"task-{self.task_id}" + str({"msg":"Error Submitting Order (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
+                   print(Fore.RED + "task-{}".format(self.task_id) + str({"msg":"Error Submitting Order (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"}))
                    print(Fore.BLUE)
                 time.sleep(self.error_delay)
     
@@ -543,7 +543,7 @@ class Walmart:
       #          self.status_signal.emit({"msg":"Browser Ready","status":"alt","url":"https://www.walmart.com/checkout/#/payment","cookies":[{"name":cookie.name,"value":cookie.value,"domain":cookie.domain} for cookie in self.session.cookies]})
       #       else:
       #           pass
-      #       #    print(f"task-{self.task_id}" + str({"msg":"Browser Ready","status":"alt","url":"https://www.walmart.com/checkout/#/payment","cookies":[{"name":cookie.name,"value":cookie.value,"domain":cookie.domain} for cookie in self.session.cookies]}))
+      #       #    print("task-{}".format(self.task_id) + str({"msg":"Browser Ready","status":"alt","url":"https://www.walmart.com/checkout/#/payment","cookies":[{"name":cookie.name,"value":cookie.value,"domain":cookie.domain} for cookie in self.session.cookies]}))
       #       # #send_webhook("B","Walmart",self.profile["profile_name"],self.task_id,self.product_image)
       #       return True
         return False

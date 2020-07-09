@@ -17,9 +17,11 @@ lxml = "==4.5.0"
 darkdetect = "==0.1.1"
 colorama = "==0.4.3"
 pycryptodome = "==3.9.8"
-pandas = "==1.0.5"
 Unidecode = "*"
+pandas = "*"
+future-fstrings = "*"
 pypiwin32 = "*"
+setuptools = "<45.0.0"
 
 [requires]
-python_version = "3.7"
+python_version = "3.5.4"

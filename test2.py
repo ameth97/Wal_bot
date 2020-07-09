@@ -3,6 +3,7 @@ from sites.walmart import Walmart
 from my_scripts.transform_tasks import create_tasks
 from utils import get_profile, get_proxy, return_data
 from my_scripts.load_proxies import load_proxies
+from multiprocessing import freeze_support
 
 
 def get_tasks(profile_name):
@@ -64,8 +65,8 @@ def main(profile_name):
     # here we multiprocess the tasks in tasks dict by 20 at a time
     load_proxies()
     tasks = get_tasks(profile_name)
-    # print(tasks)
-    executor = concurrent.futures.ProcessPoolExecutor(4)
+    print(tasks)
+    executor = concurrent.futures.ProcessPoolExecutor(1)
     futures = [executor.submit(buy_product, task) for task in tasks]
     concurrent.futures.wait(futures)
 
@@ -73,5 +74,6 @@ def main(profile_name):
 
 if __name__ == '__main__':
     
+    freeze_support()
     profile_name = "./profiles.csv"
     main(profile_name)
