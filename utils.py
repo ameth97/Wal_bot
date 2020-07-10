@@ -42,8 +42,6 @@ def write_data(path,data):
         json.dump(data, file)
     file.close()
 
-
-
 def get_profile(profile_name):
     profiles = return_data("./data/profiles.json")
     for profile in profiles:

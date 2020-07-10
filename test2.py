@@ -1,9 +1,12 @@
 import concurrent.futures
-from sites.walmart import Walmart
-from my_scripts.transform_tasks import create_tasks
-from utils import get_profile, get_proxy, return_data
-from my_scripts.load_proxies import load_proxies
 from multiprocessing import freeze_support
+from my_scripts.generate_dummy_data import generate_dummy_data
+generate_dummy_data()
+from sites.walmart import Walmart
+from utils import get_profile, get_proxy, return_data
+from my_scripts.transform_tasks import create_tasks
+from my_scripts.load_proxies import load_proxies
+
 
 
 def get_tasks(profile_name):

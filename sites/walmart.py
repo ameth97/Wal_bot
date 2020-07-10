@@ -3,6 +3,7 @@ from utils import  get_proxy, send_webhook, EventLogger
 import urllib,requests,time,lxml.html,json,sys,settings
 import random
 from colorama import Fore
+import sys
 
 eventLogger = EventLogger()
 class Walmart:
@@ -71,7 +72,7 @@ class Walmart:
                                    eventLogger.alt(self.task_id, "Waiting For Price Restock")
                                 if not self.is_monitored:
                                     eventLogger.alt(self.task_id, 'idle monitoring')
-                                    exit(1)
+                                    sys.exit()
                                 wait_restock = True
                                 self.session.cookies.clear()
                                 time.sleep(self.monitor_delay)
@@ -97,13 +98,13 @@ class Walmart:
                      if not self.flask:
                         self.status_signal.emit({"msg":"Product Not Found","status":"normal"})
                      else:
-                        eventLogger.normal(self.task_id, "Product Not Found")
+                        eventLogger.error(self.task_id, "Product Not Found")
                      time.sleep(self.monitor_delay)
             except Exception as e:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Loading Product Page (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   eventLogger.error(self.task_id, "Error Loading Product Page (line {} {} {})")
+                   eventLogger.error(self.task_id, "Error Loading Product Page")
                 time.sleep(self.error_delay)
     
     def atc(self,offer_id):

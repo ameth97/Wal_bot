@@ -30,6 +30,6 @@ def load_proxies():
 
             print("Loaded Proxies")
     except Exception as e:
-        print("loading proxies failed...check myproxies.txt")
+        print("loading proxies failed...check my_proxies.txt")
         raise e
  

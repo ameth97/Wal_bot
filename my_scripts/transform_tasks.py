@@ -31,7 +31,7 @@ def transform_to_json_profile(csv_df):
     csv_df["card_month"] = csv_df['card_month'].str.zfill(2)
     csv_df.to_json(path_or_buf='data/profiles.json', orient='records')
 
-def create_tasks( csv_path):
+def create_tasks(csv_path):
     """
     create tasks as json file with task_id, link and profile_id associated (take a look at data/tasks.json)
     this allows to use 1 profile for multiple tasks important for evolution

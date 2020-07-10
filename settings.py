@@ -1,6 +1,15 @@
+import json
+
+def return_data(path):
+    with open(path,"r") as file:
+        data = json.load(file)
+    file.close()
+    return data
+
+data = return_data('data/settings.json')[0]
 global webhook
-webhook = "https://discord.com/api/webhooks/730885837255868467/f5HbIOX0J8Wd0KuNyrgdpRH47qTOZs1URIYEn_whTAJzlZHS5qI3tsAH3T2banskCR5L"
+webhook = data["webhook"]
 global webhook_on_order
-webhook_on_order = True
+webhook_on_order = data["webhookonfailed"]
 global webhook_on_failed
-webhook_on_failed = True
+webhook_on_failed = data["webhookonorder"]
