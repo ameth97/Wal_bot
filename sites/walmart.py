@@ -88,7 +88,7 @@ class Walmart:
                         eventLogger.alt(self.task_id, "Waiting For Restock")
                     if not self.is_monitored:
                         eventLogger.alt(self.task_id, 'idle monitoring')
-                        exit(1)
+                        sys.exit()
                     wait_restock = True
                     self.session.cookies.clear()
                     time.sleep(self.monitor_delay)
@@ -104,7 +104,7 @@ class Walmart:
                 if not self.flask:
                    self.status_signal.emit({"msg":"Error Loading Product Page (line {} {} {})".format(sys.exc_info()[-1].tb_lineno, type(e).__name__, e),"status":"error"})
                 else:
-                   eventLogger.error(self.task_id, "Error Loading Product Page")
+                   eventLogger.error(self.task_id, "Error Loading Product Page", e)
                 time.sleep(self.error_delay)
     
     def atc(self,offer_id):
