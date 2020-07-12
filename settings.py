@@ -1,15 +1,17 @@
-import json
 
-def return_data(path):
+def read_settings(path):
+    settings = {}
     with open(path,"r") as file:
-        data = json.load(file)
+        lines = [line.strip() for line in file.readlines() if line.strip()]
+        for line in lines:
+            key, val = line.split(":", 1)
+            settings[key] = val
     file.close()
-    return data
+    return settings
 
-data = return_data('data/settings.json')[0]
-global webhook
-webhook = data["webhook"]
-global webhook_on_order
-webhook_on_order = data["webhookonfailed"]
-global webhook_on_failed
-webhook_on_failed = data["webhookonorder"]
+def get_settings():
+    settings = read_settings('settings.txt')
+    settings["webhookonfailed"] = bool(settings["webhookonfailed"])
+    settings["webhookonorder"] = bool(settings["webhookonorder"])
+    return settings
+

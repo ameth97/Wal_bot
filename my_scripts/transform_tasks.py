@@ -1,7 +1,7 @@
 
 #!/usr/bin/env python
 import pandas as pd
-
+from settings import get_settings
 
 def transform_to_json_profile(csv_df):
     
@@ -37,19 +37,18 @@ def create_tasks(csv_path):
     this allows to use 1 profile for multiple tasks important for evolution
     the user could have 1 profile and associate it to multiples tasks rather than having 1 profile for 1 task
     Args:
-        csv_path (string): path of the profiles.csv file
+        csv_path (string): path of the tasks.csv file
 
     Returns:
         [pandas dataframe]: csv containing only profile infos
     """
-
+    settings = get_settings()
     csv_df = pd.read_csv(csv_path, dtype=object, sep=',')
-    
     task_df = csv_df[["store", "link"]].copy().rename(
         columns={'store': 'site', 'link': 'product'})
     task_df["profile"] = task_df.index
-    task_df["monitor_delay"] = "5.0" #delay to send request for monitorinf
-    task_df["error_delay"] = "5.0" #delay to retry when there is error
+    task_df["monitor_delay"] = settings["monitor_delay"] #delay to send request for monitorinf
+    task_df["error_delay"] = settings["error_delay"] #delay to retry when there is error
     task_df["max_price"] = "" #not user for now, but permits to not buy if the price is below this
     task_df["proxies"] = "news" #proxy list name
     task_df["site"] = "Walmart" # site name
@@ -68,4 +67,4 @@ def create_tasks(csv_path):
 
 
 if __name__ == "__main__":
-    create_tasks('./profiles.csv')
+    create_tasks('./tasks.csv')

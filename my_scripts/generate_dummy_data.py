@@ -14,28 +14,25 @@ zproxy.lum-superproxy.io:22225:lum-customer-hl_6c936c5b-zone-footdev-ip-67.227.8
 
 dummy_proxies_json = """[{"list_name": "news", "proxies": ""}]"""
 
-dummy_settings = """webhook,webhookonorder,webhookonfailed
-https://discord.com/api/webhooks/730885837255868467/f5HbIOX0J8Wd0KuNyrgdpRH47qTOZs1URIYEn_whTAJzlZHS5qI3tsAH3T2banskCR5L,True,True
+dummy_settings = """webhook:https://discord.com/api/webhooks/730885837255868467/f5HbIOX0J8Wd0KuNyrgdpRH47qTOZs1URIYEn_whTAJzlZHS5qI3tsAH3T2banskCR5L
+webhookonorder:True
+webhookonfailed:True
+monitor_delay:5.0
+error_delay:5.0
 """
-def create_settings(csv_path):
-    csv_df = pd.read_csv(csv_path, sep=',')
-    csv_df.to_json(path_or_buf='data/settings.json', orient='records')
 
 def generate_dummy_data():
 
     if not os.path.exists("./data"):
         os.mkdir("data")
-        print("olal")
-
         
-    for filename, dummy_data in [("settings.csv", dummy_settings), ("profiles.csv", dummy_profile),
-                                ("my_proxies.txt", dummy_proxies), ("data/proxies.json", dummy_proxies_json)]:
+    for filename, dummy_data in [("settings.txt", dummy_settings), ("tasks.csv", dummy_profile),
+                                ("proxies.txt", dummy_proxies), ("data/proxies.json", dummy_proxies_json)]:
         if not os.path.isfile(filename):
             print("generating dummy " + filename + "...")
             f=open(filename,"wb")
             f.write(dummy_data.encode())
             f.close()
-    create_settings('./settings.csv')
 
 
 

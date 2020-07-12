@@ -7,8 +7,9 @@ except:
     from Cryptodome.Cipher import AES
 from colorama import init, Fore, Back, Style
 from datetime import datetime
-import json, platform, darkdetect, random, settings, threading, hashlib, base64
+import json, platform, darkdetect, random, threading, hashlib, base64
 from webhook import DiscordWebhook, DiscordEmbed
+from settings import get_settings
 
 # this is for coloring
 normal_color = Fore.BLUE
@@ -30,6 +31,8 @@ class EventLogger:
         print(Fore.RED + "[{}][TASK {}] {}".format(self.ts(),task_id,msg))
     def success(self,task_id,msg):
         print(Fore.GREEN + "[{}][TASK {}] {}".format(self.ts(),task_id,msg))
+    def present(self, msg):
+        print(Fore.WHITE + "[{}] {}".format(self.ts(), msg))
 
 def return_data(path):
     with open(path,"r") as file:
@@ -88,26 +91,28 @@ def format_proxy(proxy):
     except IndexError:
         return {"http": "http://" + proxy, "https": "https://" + proxy}
 
-def send_webhook(webhook_type,site,profile,task_id,image_url):
-    if settings.webhook !="":
-        webhook = DiscordWebhook(url=settings.webhook, username="walmart Bot", avatar_url="https://i.imgur.com/tdp2hPi.jpg")
+def send_webhook(webhook_type, site, profile, task_id, image_url, price, email, product):
+    settings = get_settings()
+    if settings["webhook "]!="":
+        webhook = DiscordWebhook(url=settings["webhook"], username="walmart Bot", avatar_url="https://i.imgur.com/tdp2hPi.jpg")
         if webhook_type == "OP":
-            if not settings.webhook_on_order:
+            if not settings["webhook_on_order"]:
                 return
             embed = DiscordEmbed(title="Order Placed",color=0x34c693)
-        elif webhook_type == "B":
-            if not settings.webhook_on_browser:
-                return
-            embed = DiscordEmbed(title="Complete Order in Browser",color=0xf2a689)
+
         elif webhook_type == "PF":
-            if not settings.webhook_on_failed:
+            if not settings["webhook_on_failed"]:
                 return
-            embed = DiscordEmbed(title="Payment Failed",color=0xfc5151)
+            embed = DiscordEmbed(title="Payment Failed", color=0xfc5151)
         embed.set_footer(text="Via walmart Bot",icon_url="https://i.imgur.com/tdp2hPi.jpg")
-        embed.add_embed_field(name="Site", value=site,inline=True)
-        embed.add_embed_field(name="Profile", value=profile,inline=True)
-        embed.add_embed_field(name="Task ID", value=task_id,inline=True)
+        embed.add_embed_field(name="Site", value=site, inline=False)
+        embed.add_embed_field(name="Profile", value=profile)
+        embed.add_embed_field(name="Quantity", value="1")
+        embed.add_embed_field(name="Price", value=str(price))
+        embed.add_embed_field(name="email", value=email, inline=False)
+        embed.add_embed_field(name="Product", value=product, inline=False)
         embed.set_thumbnail(url=image_url)
+        embed.set_timestamp()
         webhook.add_embed(embed)
         try:
             webhook.execute()

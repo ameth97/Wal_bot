@@ -3,14 +3,14 @@ from utils import return_data, write_data
 
 def load_proxies():
     """
-    Function to load proxies from my_proxies.txt and transform it to json
+    Function to load proxies from proxies.txt and transform it to json
     """
-    print("loading proxies...")
     try:
-        f = open("my_proxies.txt", "rt")
+        f = open("proxies.txt", "rt")
         proxies = f.read()
         f.close()
         list_name = "news" #I created a default proxy list name, as I though this could evoluate to allow users to use multiple proxy list
+        num_proxies = len(proxies.splitlines())
         if proxies != "" and list_name != "":
             for item in proxies.splitlines():
                 if ":" not in item or item == "":
@@ -27,9 +27,9 @@ def load_proxies():
                     break
             proxies.append(proxies_data)
             write_data("./data/proxies.json",proxies)
+            return num_proxies
 
-            print("Loaded Proxies")
     except Exception as e:
-        print("loading proxies failed...check my_proxies.txt")
+        print("loading proxies failed...check proxies.txt")
         raise e
  

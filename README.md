@@ -9,8 +9,8 @@
 - pipenv shell (pipenv)
 
 ## Execution
-- put profiles in profiles.csv (each line is a task - id start from 0)
-- put proxies in my_proxies.txt
+- put tasks in tasks.csv (each line is a task - id start from 0)
+- put proxies in proxies.txt
 - pip install pipenv
 - run pipenv
 - run python test2.py

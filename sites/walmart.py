@@ -1,9 +1,10 @@
 from sites.walmart_encryption import walmart_encryption as w_e
 from utils import  get_proxy, send_webhook, EventLogger
-import urllib,requests,time,lxml.html,json,sys,settings
+import urllib,requests,time,lxml.html,json,sys
 import random
 from colorama import Fore
 import sys
+from settings import get_settings
 
 eventLogger = EventLogger()
 class Walmart:
@@ -13,6 +14,8 @@ class Walmart:
              self.proxies, self.is_monitored, self.profile_name, self.monitor_group, self.run_task_group = (task_id,status_signal,image_signal,product,
                                     profile,float(monitor_delay),float(error_delay),max_price, flask, proxies, is_monitored, 
                                     profile_name, monitor_group, run_task_group)
+        self.price = 0
+        self.product_name = ""
         """
       Constructor of walmart class
       automatically load profiles and performs tasks when called
@@ -23,6 +26,7 @@ class Walmart:
         if not self.flask: # I was trying to use flask to create api to upload directly csv this can be evolution
            self.status_signal.emit({"msg":"Starting","status":"normal"})
         else:
+           time.sleep(random.random())
            eventLogger.normal(self.task_id, "Starting")
       
         # this are the requests send by walamart during the process of buying product it's just copy paste from console
@@ -57,12 +61,14 @@ class Walmart:
                 r = self.session.get(self.product,headers=headers)
                 if r.status_code == 200:
                     doc = lxml.html.fromstring(r.text)
+                    self.product_name = doc.xpath('//h1[@itemprop="name"]/@content')[0]
                     if not image_found:
                         product_image = doc.xpath('//meta[@property="og:image"]/@content')[0]
                         if not self.flask:
                             self.image_signal.emit(product_image)
                         image_found = True
                     price = float(doc.xpath('//span[@itemprop="price"]/@content')[0])
+                    self.price = price
                     if "add to cart" in r.text.lower():
                         if self.max_price !="":
                             if float(self.max_price) < price:
@@ -495,6 +501,7 @@ class Walmart:
             "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.69 Safari/537.36",
             "wm_vertical_id": "0"
         }
+        settings = get_settings()
         while True:
             if not self.flask:
                self.status_signal.emit({"msg":"Submitting Order","status":"alt"})
@@ -516,7 +523,9 @@ class Walmart:
                           eventLogger.error(self.task_id, 'error logging success task')
                        finally:
                           f.close()
-                    send_webhook("OP","Walmart",self.profile["profile_name"],self.task_id,self.product_image)
+                    if settings['webhook_on_order']:
+                     send_webhook("OP","Walmart",self.profile["profile_name"],self.task_id,self.product_image,
+                     self.price, self.profile["billing_email"], self.product_name)
                     return
                 except:
                     if not self.flask:
@@ -526,7 +535,9 @@ class Walmart:
 
                     if self.check_browser():
                         return
-                    send_webhook("PF","Walmart",self.profile["profile_name"],self.task_id,self.product_image)
+                    if settings["webhook_on_failed"]:
+                     send_webhook("PF","Walmart",self.profile["profile_name"],self.task_id,self.product_image,
+                    self.price, self.profile["billing_email"], self.product_name)
                     return
             except Exception as e:
                 if not self.flask:

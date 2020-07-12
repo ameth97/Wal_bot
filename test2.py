@@ -3,10 +3,23 @@ from multiprocessing import freeze_support
 from my_scripts.generate_dummy_data import generate_dummy_data
 generate_dummy_data()
 from sites.walmart import Walmart
-from utils import get_profile, get_proxy, return_data
+from utils import get_profile, get_proxy, return_data, EventLogger
 from my_scripts.transform_tasks import create_tasks
 from my_scripts.load_proxies import load_proxies
+from os import system, name 
+import time
 
+
+# define our clear function 
+
+def clear(): 
+    # for windows 
+    if name == 'nt': 
+        _ = system('cls') 
+
+    # for mac and linux(here, os.name is 'posix') 
+    else: 
+        _ = system('clear') 
 
 
 def get_tasks(profile_name):
@@ -65,8 +78,18 @@ def run_task_group(profile_name, monitor_group):
 
 def main(profile_name):
     # here we multiprocess the tasks in tasks dict by 20 at a time
-    load_proxies()
+    num_proxies = load_proxies()
+    my_logger = EventLogger()
     tasks = get_tasks(profile_name)
+    my_logger.present("{} tasks loaded, {} proxies loaded".format(len(tasks), num_proxies))
+    my_logger.present("1. Walmart")
+    my_logger.present("Please select: ")
+    choice = ""
+    while choice != "1":
+        choice = input("> ")
+        if choice != "1":
+            print("Select a correct number please")
+    clear()
     num = min(20,len(tasks))
     executor = concurrent.futures.ProcessPoolExecutor(num)
     futures = [executor.submit(buy_product, task) for task in tasks]
@@ -77,5 +100,5 @@ def main(profile_name):
 if __name__ == '__main__':
     
     freeze_support()
-    profile_name = "./profiles.csv"
+    profile_name = "./tasks.csv"
     main(profile_name)
