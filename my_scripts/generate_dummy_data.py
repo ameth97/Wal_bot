@@ -15,8 +15,8 @@ zproxy.lum-superproxy.io:22225:lum-customer-hl_6c936c5b-zone-footdev-ip-67.227.8
 dummy_proxies_json = """[{"list_name": "news", "proxies": ""}]"""
 
 dummy_settings = """webhook:https://discord.com/api/webhooks/730885837255868467/f5HbIOX0J8Wd0KuNyrgdpRH47qTOZs1URIYEn_whTAJzlZHS5qI3tsAH3T2banskCR5L
-webhookonorder:True
-webhookonfailed:True
+webhook_on_order:True
+webhook_on_failed:True
 monitor_delay:5.0
 error_delay:5.0
 """

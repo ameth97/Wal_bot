@@ -93,7 +93,7 @@ def format_proxy(proxy):
 
 def send_webhook(webhook_type, site, profile, task_id, image_url, price, email, product):
     settings = get_settings()
-    if settings["webhook "]!="":
+    if settings["webhook"]!="":
         webhook = DiscordWebhook(url=settings["webhook"], username="walmart Bot", avatar_url="https://i.imgur.com/tdp2hPi.jpg")
         if webhook_type == "OP":
             if not settings["webhook_on_order"]:

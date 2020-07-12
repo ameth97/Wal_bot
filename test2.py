@@ -94,6 +94,9 @@ def main(profile_name):
     executor = concurrent.futures.ProcessPoolExecutor(num)
     futures = [executor.submit(buy_product, task) for task in tasks]
     concurrent.futures.wait(futures)
+    while choice != "q":
+        print("Enter q to exit")
+        choice = input("> ")
 
 
 

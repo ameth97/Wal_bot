@@ -502,6 +502,7 @@ class Walmart:
             "wm_vertical_id": "0"
         }
         settings = get_settings()
+        on_order, on_failed = settings['webhook_on_order'],settings['webhook_on_failed']
         while True:
             if not self.flask:
                self.status_signal.emit({"msg":"Submitting Order","status":"alt"})
@@ -523,7 +524,7 @@ class Walmart:
                           eventLogger.error(self.task_id, 'error logging success task')
                        finally:
                           f.close()
-                    if settings['webhook_on_order']:
+                    if (on_order):
                      send_webhook("OP","Walmart",self.profile["profile_name"],self.task_id,self.product_image,
                      self.price, self.profile["billing_email"], self.product_name)
                     return
@@ -535,8 +536,8 @@ class Walmart:
 
                     if self.check_browser():
                         return
-                    if settings["webhook_on_failed"]:
-                     send_webhook("PF","Walmart",self.profile["profile_name"],self.task_id,self.product_image,
+                    if (on_failed):
+                      send_webhook("PF","Walmart",self.profile["profile_name"],self.task_id,self.product_image,
                     self.price, self.profile["billing_email"], self.product_name)
                     return
             except Exception as e:

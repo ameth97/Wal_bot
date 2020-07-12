@@ -11,7 +11,7 @@ def read_settings(path):
 
 def get_settings():
     settings = read_settings('settings.txt')
-    settings["webhookonfailed"] = bool(settings["webhookonfailed"])
-    settings["webhookonorder"] = bool(settings["webhookonorder"])
+    settings["webhook_on_failed"] = bool(settings["webhook_on_failed"])
+    settings["webhook_on_order"] = bool(settings["webhook_on_order"])
     return settings
 
